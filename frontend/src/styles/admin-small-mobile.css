@@ -1,0 +1,667 @@
+/* Final small-screen pass. Every selector is restricted to an admin page root. */
+
+@media (max-width: 480px) {
+  .wf-admin-dashboard,
+  .wf-admin-details-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .wf-admin-dashboard > .wf-navbar--admin.wf-header,
+  .wf-admin-details-page > .wf-navbar--admin.wf-header {
+    width: 100% !important;
+    min-height: 68px !important;
+    height: 68px !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    padding: 7px 10px !important;
+    overflow: visible !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-logo,
+  .wf-admin-details-page .wf-navbar--admin .wf-logo {
+    min-width: 0 !important;
+    max-width: 132px !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-logo img,
+  .wf-admin-details-page .wf-navbar--admin .wf-logo img {
+    width: 124px !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-mobile-actions,
+  .wf-admin-details-page .wf-navbar--admin .wf-mobile-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-top-btn--compact,
+  .wf-admin-details-page .wf-navbar--admin .wf-top-btn--compact {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    border-radius: 11px !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-top-btn--compact .wf-icon,
+  .wf-admin-details-page .wf-navbar--admin .wf-top-btn--compact .wf-icon {
+    width: 21px !important;
+    min-width: 21px !important;
+    height: 21px !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-profile-menu,
+  .wf-admin-details-page .wf-navbar--admin .wf-profile-menu {
+    right: 0 !important;
+    width: min(250px, calc(100vw - 20px)) !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  .wf-admin-dashboard .wf-admin-main {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 24px !important;
+    padding: 8px 10px 24px !important;
+  }
+
+  .wf-admin-dashboard .wf-admin-main > *,
+  .wf-admin-dashboard .wf-admin-section,
+  .wf-admin-dashboard .wf-two-column--bookings {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .wf-admin-dashboard .wf-two-column--bookings {
+    gap: 10px !important;
+  }
+
+  .wf-admin-dashboard .wf-calendar-panel {
+    padding: 12px 10px !important;
+    border-radius: 13px !important;
+  }
+
+  .wf-admin-dashboard .wf-section-title--calendar {
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    gap: 8px 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-section-title--calendar .wf-large-icon {
+    width: 46px !important;
+    min-width: 46px !important;
+    height: 46px !important;
+  }
+
+  .wf-admin-dashboard .wf-section-title--calendar h1 {
+    font-size: clamp(25px, 8vw, 32px) !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-dashboard .wf-section-title--calendar p {
+    margin-top: 3px !important;
+    font-size: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-section-title--calendar .wf-month-pills {
+    gap: 6px !important;
+  }
+
+  .wf-admin-dashboard .wf-month-pill {
+    min-height: 36px !important;
+    padding-inline: 11px !important;
+    font-size: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-month-pill--label {
+    min-width: min(176px, 57vw) !important;
+  }
+
+  .wf-admin-dashboard .wf-city-box {
+    margin-bottom: 12px !important;
+    padding: 10px !important;
+    border-width: 1px !important;
+    border-radius: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-city-box h3 {
+    margin-bottom: 8px !important;
+    font-size: 16px !important;
+  }
+
+  .wf-admin-dashboard .wf-city-box__list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .wf-admin-dashboard .wf-city-pill {
+    min-width: 0 !important;
+    min-height: 38px !important;
+    padding: 5px 7px !important;
+    font-size: 11px !important;
+  }
+
+  .wf-admin-dashboard .wf-calendar-grid > .wf-calendar-weekday {
+    padding: 7px 1px 9px !important;
+    font-size: 9px !important;
+  }
+
+  .wf-admin-dashboard .wf-calendar-day {
+    min-height: 42px !important;
+    padding: 4px 2px !important;
+    font-size: 13px !important;
+  }
+
+  .wf-admin-dashboard .wf-calendar-day.is-selected b {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .wf-admin-dashboard .wf-dots {
+    bottom: 5px !important;
+    gap: 3px !important;
+  }
+
+  .wf-admin-dashboard .wf-dots i {
+    width: 5px !important;
+    height: 5px !important;
+  }
+
+  .wf-admin-dashboard .wf-filters-bar {
+    grid-template-columns: minmax(0, 1fr) 44px !important;
+    gap: 8px !important;
+  }
+
+  .wf-admin-dashboard .wf-filter-tabs {
+    gap: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  .wf-admin-dashboard .wf-filter-tabs button {
+    min-width: 82px !important;
+    min-height: 40px !important;
+    padding-inline: 10px !important;
+    font-size: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-search,
+  .wf-admin-dashboard .wf-filter-btn {
+    min-height: 44px !important;
+  }
+
+  .wf-admin-dashboard .wf-filter-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-card {
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+    border-radius: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-date-tile {
+    min-height: 100% !important;
+    padding: 8px 3px !important;
+  }
+
+  .wf-admin-dashboard .wf-date-tile strong {
+    font-size: 30px !important;
+  }
+
+  .wf-admin-dashboard .wf-date-tile small,
+  .wf-admin-dashboard .wf-date-tile span,
+  .wf-admin-dashboard .wf-date-tile em {
+    font-size: 9px !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-content {
+    padding: 10px 9px !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-main h2 {
+    font-size: 16px !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-main p,
+  .wf-admin-dashboard .wf-provider-box p,
+  .wf-admin-dashboard .wf-provider-box strong,
+  .wf-admin-dashboard .wf-booking-meta span {
+    font-size: 10.5px !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin: 9px 0 !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-actions button {
+    min-height: 34px !important;
+    padding: 4px !important;
+    font-size: 10px !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-meta {
+    gap: 7px !important;
+    padding-top: 9px !important;
+  }
+
+  .wf-admin-dashboard .wf-admin-title-row {
+    display: grid !important;
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 8px 0 14px !important;
+  }
+
+  .wf-admin-dashboard .wf-admin-title-row .wf-large-icon {
+    width: 46px !important;
+    min-width: 46px !important;
+    height: 46px !important;
+  }
+
+  .wf-admin-dashboard .wf-admin-title-row h1 {
+    margin: 0 !important;
+    font-size: clamp(24px, 7.7vw, 30px) !important;
+    line-height: 1.06 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-dashboard .wf-admin-title-row p {
+    margin: 4px 0 0 !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+
+  .wf-admin-dashboard .wf-blocks-grid {
+    gap: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-blocks-left {
+    order: 1 !important;
+    gap: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-blocks-sidebar {
+    order: 2 !important;
+    grid-row: auto !important;
+    gap: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-filters-card,
+  .wf-admin-dashboard .wf-table-card,
+  .wf-admin-dashboard .wf-side-card {
+    width: 100% !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-filters-card {
+    gap: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-filters-card input,
+  .wf-admin-dashboard .wf-filters-card select,
+  .wf-admin-dashboard .wf-filters-card button {
+    width: 100% !important;
+    min-height: 44px !important;
+  }
+
+  .wf-admin-dashboard .wf-table-card h2,
+  .wf-admin-dashboard .wf-side-card h2 {
+    font-size: 17px !important;
+  }
+
+  .wf-admin-dashboard .wf-table-row {
+    gap: 10px !important;
+    padding: 12px 10px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-dashboard .wf-table-row > span {
+    min-width: 0 !important;
+  }
+
+  .wf-admin-dashboard .wf-row-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+  }
+
+  .wf-admin-dashboard .wf-row-actions button {
+    width: 100% !important;
+    min-height: 40px !important;
+  }
+
+  .wf-admin-dashboard .wf-mini-grid {
+    gap: 4px !important;
+  }
+
+  .wf-admin-dashboard .wf-mini-grid b {
+    font-size: 9px !important;
+  }
+
+  .wf-admin-dashboard .wf-mini-grid span {
+    min-height: 32px !important;
+    font-size: 12px !important;
+  }
+
+  .wf-admin-dashboard .admin-panel-header--plain,
+  .wf-admin-dashboard .admin-financial-title {
+    padding: 10px 2px 8px !important;
+  }
+
+  .wf-admin-dashboard .admin-panel-header--plain h1,
+  .wf-admin-dashboard .admin-financial-title h1 {
+    font-size: clamp(27px, 8.5vw, 34px) !important;
+    line-height: 1.05 !important;
+  }
+
+  .wf-admin-dashboard .admin-panel-header--plain p,
+  .wf-admin-dashboard .admin-financial-title p {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  .wf-admin-dashboard .admin-history-filters,
+  .wf-admin-dashboard .admin-history-results,
+  .wf-admin-dashboard .admin-history-selected,
+  .wf-admin-dashboard .admin-financial-card,
+  .wf-admin-dashboard .admin-financial-summary-card {
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-filters {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-filters select,
+  .wf-admin-dashboard .admin-history-filters input {
+    width: 100% !important;
+    min-height: 46px !important;
+    padding-inline: 10px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-wireframe-layout,
+  .wf-admin-dashboard .admin-history-card-list {
+    gap: 10px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-card-list button {
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-provider {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+  }
+
+  .wf-admin-dashboard .admin-history-avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-selected__person {
+    grid-template-columns: 54px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding-bottom: 16px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-selected__person .admin-history-avatar {
+    width: 54px !important;
+    height: 54px !important;
+    font-size: 18px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-selected h2 {
+    font-size: 21px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-dashboard .admin-history-selected dt,
+  .wf-admin-dashboard .admin-history-selected dd {
+    padding: 10px 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-dashboard .admin-history-reschedule-form {
+    padding: 12px !important;
+  }
+
+  .wf-admin-dashboard .admin-history-reschedule-form > div,
+  .wf-admin-dashboard .admin-history-reschedule-form footer {
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+
+  .wf-admin-dashboard .admin-financial-panel .admin-panel-actions,
+  .wf-admin-dashboard .admin-financial-summary,
+  .wf-admin-dashboard .admin-financial-action-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .wf-admin-details-page .wf-details-main {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 24px !important;
+    padding: 10px !important;
+  }
+
+  .wf-admin-details-page .wf-admin-title-row {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .wf-admin-details-page .wf-back-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+  }
+
+  .wf-admin-details-page .wf-admin-title-row h1 {
+    margin: 0 !important;
+    font-size: clamp(23px, 7.4vw, 29px) !important;
+    line-height: 1.08 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-details-page .wf-admin-title-row p {
+    margin: 4px 0 0 !important;
+    font-size: 12px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-details-page .wf-details-grid,
+  .wf-admin-details-page .wf-details-cards {
+    gap: 10px !important;
+  }
+
+  .wf-admin-details-page .wf-detail-card {
+    min-height: 0 !important;
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    padding: 13px !important;
+    border-radius: 12px !important;
+  }
+
+  .wf-admin-details-page .wf-detail-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .wf-admin-details-page .wf-detail-card h2 {
+    margin-bottom: 8px !important;
+    font-size: 17px !important;
+  }
+
+  .wf-admin-details-page .wf-detail-items {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+
+  .wf-admin-details-page .wf-detail-items span {
+    min-width: 0 !important;
+    padding: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-details-page .wf-detail-card button,
+  .wf-admin-details-page .wf-detail-card .wf-badge {
+    grid-column: 2 !important;
+  }
+
+  .wf-admin-details-page .wf-detail-actions {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .wf-admin-details-page .wf-detail-actions button {
+    min-height: 46px !important;
+  }
+
+  .wf-admin-details-page .wf-map-card {
+    min-height: 400px !important;
+    border-radius: 12px !important;
+  }
+
+  .wf-admin-details-page .wf-map-btn {
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100% - 24px) !important;
+    min-height: 42px !important;
+  }
+
+  .wf-admin-details-page .wf-map-btn--left {
+    top: 12px !important;
+  }
+
+  .wf-admin-details-page .wf-map-btn--right {
+    top: 62px !important;
+  }
+
+  .wf-admin-details-page .wf-map-label {
+    max-width: calc(100% - 24px) !important;
+    padding: 12px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-details-page .wf-map-label--origin {
+    left: 12px !important;
+    bottom: 70px !important;
+  }
+
+  .wf-admin-details-page .wf-map-label--dest {
+    top: 122px !important;
+    right: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-backdrop,
+  .wf-admin-details-page .wf-modal-backdrop {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .wf-admin-dashboard .wf-modal,
+  .wf-admin-details-page .wf-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 94dvh !important;
+    margin: 0 !important;
+    padding: 18px 12px calc(14px + env(safe-area-inset-bottom)) !important;
+    border-radius: 18px 18px 0 0 !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-title,
+  .wf-admin-details-page .wf-modal-title {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    padding-right: 38px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-title > span,
+  .wf-admin-details-page .wf-modal-title > span {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-title h2,
+  .wf-admin-details-page .wf-modal-title h2 {
+    font-size: 21px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-title p,
+  .wf-admin-details-page .wf-modal-title p {
+    font-size: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-create-booking-form,
+  .wf-admin-details-page .wf-create-booking-form,
+  .wf-admin-dashboard .wf-admin-block-modal--wireframe,
+  .wf-admin-details-page .wf-admin-block-modal--wireframe {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-actions,
+  .wf-admin-details-page .wf-modal-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    margin-top: 16px !important;
+  }
+
+  .wf-admin-dashboard .wf-modal-actions button,
+  .wf-admin-details-page .wf-modal-actions button {
+    width: 100% !important;
+    min-height: 46px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .wf-admin-dashboard .wf-navbar--admin .wf-logo,
+  .wf-admin-details-page .wf-navbar--admin .wf-logo {
+    max-width: 112px !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-logo img,
+  .wf-admin-details-page .wf-navbar--admin .wf-logo img {
+    width: 108px !important;
+  }
+
+  .wf-admin-dashboard .wf-navbar--admin .wf-top-btn--compact,
+  .wf-admin-details-page .wf-navbar--admin .wf-top-btn--compact {
+    width: 39px !important;
+    min-width: 39px !important;
+    height: 39px !important;
+    min-height: 39px !important;
+  }
+
+  .wf-admin-dashboard .wf-city-box__list,
+  .wf-admin-dashboard .wf-booking-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .wf-admin-dashboard .wf-booking-card {
+    grid-template-columns: 60px minmax(0, 1fr) !important;
+  }
+
+  .wf-admin-dashboard .wf-calendar-panel,
+  .wf-admin-dashboard .admin-history-filters,
+  .wf-admin-dashboard .admin-history-results,
+  .wf-admin-dashboard .admin-history-selected {
+    padding-inline: 9px !important;
+  }
+}
