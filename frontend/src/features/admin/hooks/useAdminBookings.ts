@@ -4,6 +4,7 @@ import type { ServicoResponse } from '../../../types/api';
 import type { CalendarEvent } from '../../calendar/types';
 import { getAdminBookings } from '../api/get-admin-bookings';
 import type { AdminFilters } from '../types';
+import { toAppDateTimeParts, toAppTimePart } from '../../../lib/dates';
 
 function buildFiltersKey(filters: AdminFilters) {
   return JSON.stringify(filters ?? {});
@@ -11,13 +12,14 @@ function buildFiltersKey(filters: AdminFilters) {
 
 function mapServicoToCalendarEvent(servico: ServicoResponse): CalendarEvent {
   const customerName = `${servico.clientFirstName} ${servico.clientLastName}`.trim();
+  const start = toAppDateTimeParts(servico.start);
 
   return {
     id: servico.eventId,
     title: customerName || servico.serviceType,
-    date: servico.start.slice(0, 10),
-    startTime: servico.start.slice(11, 16),
-    endTime: servico.end.slice(11, 16),
+    date: start.date,
+    startTime: start.time,
+    endTime: toAppTimePart(servico.end),
     city: servico.clientCity,
     customerName,
     customerAddress: servico.clientAddressLine,

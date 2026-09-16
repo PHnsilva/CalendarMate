@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ServicoResponse, AvailabilityBlockResponse } from '../../../types/api';
 import type { AdminBlockEntry, AdminBlockMode } from '../api/manage-admin-blocks';
+import { toAppDatePart, toAppTimePart } from '../../../lib/dates';
 
 const TIME_OPTIONS = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'] as const;
 const CANCEL_CONFIRMATION_TEXT = 'CANCELAR SERVIÇOS';
@@ -73,11 +74,11 @@ function buildCalendarCells(monthStart: string): CalendarCell[] {
 }
 
 function blockDate(block: AvailabilityBlockResponse) {
-  return block.start.slice(0, 10);
+  return toAppDatePart(block.start);
 }
 
 function bookingDate(booking: ServicoResponse) {
-  return booking.start.slice(0, 10);
+  return toAppDatePart(booking.start);
 }
 
 function bookingName(booking: ServicoResponse) {
@@ -150,7 +151,7 @@ export default function AdminBlockingCalendarModal({
       }
 
       const selectedTimesForDay = new Set(selectedTimesForDate(selectedTimes, date));
-      return dayBookings.filter((booking) => selectedTimesForDay.has(booking.start.slice(11, 16)));
+      return dayBookings.filter((booking) => selectedTimesForDay.has(toAppTimePart(booking.start)));
     }),
     [blockMode, blockedDateSet, bookingsByDate, selectedDates, selectedTimes],
   );
@@ -373,7 +374,7 @@ export default function AdminBlockingCalendarModal({
                 {selectedBookings.slice(0, 4).map((booking) => (
                   <article key={booking.eventId}>
                     <strong>{bookingName(booking)}</strong>
-                    <span>{formatShortDate(bookingDate(booking))} • {booking.start.slice(11, 16)}</span>
+                    <span>{formatShortDate(bookingDate(booking))} • {toAppTimePart(booking.start)}</span>
                   </article>
                 ))}
               </div>

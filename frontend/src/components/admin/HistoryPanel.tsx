@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import historyIcon from '../../assets/wireframes/icons/admin-history-clock.png';
 import { useAdminBookings } from '../../features/admin/hooks/useAdminBookings';
 import { getStoredAdminToken } from '../../lib/storage';
+import { toAppDateTimeParts } from '../../lib/dates';
 import type { ServicoResponse } from '../../types/api';
 
 type PeriodFilter = '30' | '90' | 'ALL';
@@ -51,7 +52,8 @@ function isCompleted(status: string): boolean {
 }
 
 function mapBooking(booking: ServicoResponse): HistoryBooking {
-  const date = booking.start?.slice(0, 10) || new Date().toISOString().slice(0, 10);
+  const start = toAppDateTimeParts(booking.start);
+  const date = start.date || toAppDateTimeParts(new Date()).date;
   return {
     id: booking.eventId,
     address: addressFromBooking(booking),
@@ -63,7 +65,7 @@ function mapBooking(booking: ServicoResponse): HistoryBooking {
     provider: booking.assignedProviderName || 'A definir',
     service: booking.serviceType || 'Serviço não informado',
     status: formatStatus(booking.status),
-    time: booking.start?.slice(11, 16) || '--:--',
+    time: start.time || '--:--',
   };
 }
 

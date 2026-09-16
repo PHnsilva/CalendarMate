@@ -2,6 +2,52 @@ function pad(value: number): string {
   return `${value}`.padStart(2, "0");
 }
 
+export const APP_TIME_ZONE = "America/Sao_Paulo";
+
+export type AppDateTimeParts = {
+  date: string;
+  time: string;
+};
+
+/**
+ * API booking timestamps are Instants (normally serialized with a trailing Z).
+ * Date/time form fields, however, must use the business timezone rather than
+ * slicing the UTC representation.
+ */
+export function toAppDateTimeParts(
+  value?: Date | string | null,
+  timeZone = APP_TIME_ZONE,
+): AppDateTimeParts {
+  if (!value) return { date: "", time: "" };
+
+  const parsed = value instanceof Date ? new Date(value.getTime()) : new Date(value);
+  if (Number.isNaN(parsed.getTime())) return { date: "", time: "" };
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(parsed);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return {
+    date: `${values.year}-${values.month}-${values.day}`,
+    time: `${values.hour}:${values.minute}`,
+  };
+}
+
+export function toAppDatePart(value?: Date | string | null): string {
+  return toAppDateTimeParts(value).date;
+}
+
+export function toAppTimePart(value?: Date | string | null): string {
+  return toAppDateTimeParts(value).time;
+}
+
 function parseDateInput(value: Date | string): Date {
   if (value instanceof Date) {
     return new Date(value.getTime());

@@ -99,6 +99,7 @@ import { confirmRecovery, resendRecovery } from '../../features/recovery/api/con
 import { startRecovery } from '../../features/recovery/api/start-recovery';
 import { isValidPhone, normalizePhone, resolveUserRoleByPhone, type UserRole } from '../../lib/authRole';
 import { buildMailtoUrl } from '../../lib/mailto';
+import { toAppDatePart, toAppDateTimeParts, toAppTimePart } from '../../lib/dates';
 import ModalShell from '../../shared/ui/ModalShell';
 import PageTitle from '../../shared/ui/PageTitle';
 import ResponsiveAsset from '../../shared/ui/ResponsiveAsset';
@@ -257,12 +258,13 @@ function formatDateOptionLabel(dateString: string): string {
 
 function mapCreatedServicoToCalendarEvent(servico: ServicoResponse): CalendarEvent {
   const customerName = `${servico.clientFirstName} ${servico.clientLastName}`.trim();
+  const start = toAppDateTimeParts(servico.start);
   return {
     id: servico.eventId,
     title: customerName || servico.serviceType || 'Agendamento',
-    date: servico.start.slice(0, 10),
-    startTime: servico.start.slice(11, 16),
-    endTime: servico.end.slice(11, 16),
+    date: start.date,
+    startTime: start.time,
+    endTime: toAppTimePart(servico.end),
     city: servico.clientCity,
     customerName,
     customerAddress: servico.clientAddressLine,
@@ -300,8 +302,9 @@ function formatStatus(value?: string): string {
 }
 
 function bookingFromServico(servico: ServicoResponse, index = 0): BookingItem {
-  const start = servico.start?.slice(0, 10) || toIsoDate(new Date());
-  const date = toLocalDate(start);
+  const start = toAppDateTimeParts(servico.start);
+  const dateValue = start.date || toIsoDate(new Date());
+  const date = toLocalDate(dateValue);
   const name = `${servico.clientFirstName ?? ''} ${servico.clientLastName ?? ''}`.trim() || 'Cliente não informado';
   const address = servico.clientAddressLine || [servico.clientStreet, servico.clientNumber, servico.clientNeighborhood, servico.clientCity, servico.clientState].filter(Boolean).join(' - ') || 'Endereço não informado';
 
@@ -313,12 +316,12 @@ function bookingFromServico(servico: ServicoResponse, index = 0): BookingItem {
     address,
     city: servico.clientCity,
     service: servico.serviceType || 'Serviço não informado',
-    date: start,
+    date: dateValue,
     day: `${date.getDate()}`.padStart(2, '0'),
     weekday: ptWeekday.format(date).replace('.', '').toUpperCase(),
     month: ptMonth.format(date).replace('.', '').toUpperCase(),
-    time: servico.start?.slice(11, 16) || '--:--',
-    endTime: servico.end?.slice(11, 16),
+    time: start.time || '--:--',
+    endTime: toAppTimePart(servico.end) || undefined,
     provider: servico.assignedProviderName || 'A definir',
     notes: servico.serviceNotes,
     color: accentCycle[index % accentCycle.length],
@@ -1245,14 +1248,14 @@ function AdminAppointmentsView({ setModal, setContext }: { setModal: (modal: Mod
 }
 
 function formatBlockDate(block: AvailabilityBlockResponse): string {
-  const source = block.start?.slice(0, 10) || block.end?.slice(0, 10) || '';
+  const source = toAppDatePart(block.start) || toAppDatePart(block.end);
   if (!source) return 'Data não informada';
   return ptLongDate.format(toLocalDate(source));
 }
 
 function formatBlockTime(block: AvailabilityBlockResponse): string {
   if (block.type?.toLowerCase() === 'day' || !block.start || !block.end) return 'Dia inteiro';
-  return `${block.start.slice(11, 16)}–${block.end.slice(11, 16)}`;
+  return `${toAppTimePart(block.start)}–${toAppTimePart(block.end)}`;
 }
 
 function AdminBlocksView({ setModal }: { setModal: (modal: ModalKind) => void }) {
@@ -1329,7 +1332,7 @@ function AdminBlocksView({ setModal }: { setModal: (modal: ModalKind) => void })
 function MiniMonth({ blocks = [] }: { blocks?: AvailabilityBlockResponse[] }) {
   const monthStart = startOfMonth();
   const grid = useMemo(() => getMonthGrid(monthStart), [monthStart]);
-  const blockedDates = useMemo(() => new Set(blocks.map((block) => block.start?.slice(0, 10) || block.end?.slice(0, 10)).filter(Boolean)), [blocks]);
+  const blockedDates = useMemo(() => new Set(blocks.map((block) => toAppDatePart(block.start) || toAppDatePart(block.end)).filter(Boolean)), [blocks]);
   const label = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(toLocalDate(monthStart));
   const today = toIsoDate(new Date());
   return (
@@ -1515,6 +1518,7 @@ function ModalField({
   value,
   type = 'text',
   inputMode,
+  step,
   error,
   onChange,
 }: {
@@ -1527,6 +1531,7 @@ function ModalField({
   value?: string;
   type?: string;
   inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'];
+  step?: InputHTMLAttributes<HTMLInputElement>['step'];
   error?: string;
   onChange?: (value: string) => void;
 }) {
@@ -1535,7 +1540,7 @@ function ModalField({
       <span className="wf-field-label">{label}{required ? <em>*</em> : null}</span>
       <span className="wf-input-shell">
         <Icon name={icon} />
-        <input type={type} inputMode={inputMode} value={value} defaultValue={value === undefined ? defaultValue : undefined} placeholder={placeholder} onChange={(event) => onChange?.(event.target.value)} />
+        <input type={type} inputMode={inputMode} step={step} value={value} defaultValue={value === undefined ? defaultValue : undefined} placeholder={placeholder} onChange={(event) => onChange?.(event.target.value)} />
       </span>
       {error ? <small className="wf-field-error">{error}</small> : null}
     </label>
@@ -2334,6 +2339,7 @@ function AdminBlockModal({ onClose }: { onClose: () => void }) {
 }
 
 function EditAdminBookingModal({ booking, onClose }: { booking?: BookingItem; onClose: () => void }) {
+  const queryClient = useQueryClient();
   const source = booking?.source && 'eventId' in booking.source ? booking.source as ServicoResponse : null;
   const [date, setDate] = useState(booking?.date ?? '');
   const [time, setTime] = useState(booking?.time ?? '');
@@ -2348,17 +2354,47 @@ function EditAdminBookingModal({ booking, onClose }: { booking?: BookingItem; on
 
   const save = async () => {
     if (!booking?.id || !source || saving) return;
-    setSaving(true);
     setError('');
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!serviceType.trim()) {
+      setError('Informe o serviço.');
+      return;
+    }
+    if (!isServiceNotesValid(serviceNotes)) {
+      setError('A observação deve explicar o serviço com pelo menos 10 caracteres.');
+      return;
+    }
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      setError('Informe uma data válida.');
+      return;
+    }
+    if (!/^\d{2}:00$/.test(time)) {
+      setError('Selecione um horário com minutos 00.');
+      return;
+    }
+    if (!firstName.trim() || !lastName.trim()) {
+      setError('Informe nome e sobrenome do cliente.');
+      return;
+    }
+    if (!isEmailValid(email)) {
+      setError('Informe um e-mail válido.');
+      return;
+    }
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      setError('Informe telefone com DDD e 10 ou 11 dígitos.');
+      return;
+    }
+
+    setSaving(true);
     const payload: ServicoRequest = {
-      serviceType,
-      serviceNotes,
+      serviceType: serviceType.trim(),
+      serviceNotes: serviceNotes.trim().replace(/\s+/g, ' '),
       date,
       time,
-      clientFirstName: firstName,
-      clientLastName: lastName,
-      clientEmail: email,
-      clientPhone: phone.replace(/\D/g, ''),
+      clientFirstName: firstName.trim(),
+      clientLastName: lastName.trim(),
+      clientEmail: email.trim(),
+      clientPhone: phoneDigits,
       clientCep: source.clientCep,
       clientStreet: source.clientStreet,
       clientNeighborhood: source.clientNeighborhood,
@@ -2369,8 +2405,11 @@ function EditAdminBookingModal({ booking, onClose }: { booking?: BookingItem; on
     };
     try {
       await updateAdminBooking(booking.id, payload);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['admin-bookings'] }),
+        queryClient.invalidateQueries({ queryKey: ['admin-summary'] }),
+      ]);
       onClose();
-      window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Nao foi possivel editar.');
     } finally {
@@ -2387,7 +2426,7 @@ function EditAdminBookingModal({ booking, onClose }: { booking?: BookingItem; on
           <ModalField label="Servico" icon="edit" value={serviceType} onChange={setServiceType} />
           <label className="wf-span-2">Observacao<textarea value={serviceNotes} onChange={(event) => setServiceNotes(event.target.value)} placeholder="Explique o servico solicitado pelo cliente." /></label>
           <ModalField label="Data" icon="calendar" type="date" value={date} onChange={setDate} />
-          <ModalField label="Horario" icon="clock" type="time" value={time} onChange={setTime} />
+          <ModalField label="Horario" icon="clock" type="time" step={3600} value={time} onChange={setTime} />
           <ModalField label="Telefone" icon="phone" value={phone} onChange={setPhone} />
           <ModalField label="Nome" icon="user" value={firstName} onChange={setFirstName} />
           <ModalField label="Sobrenome" icon="user" value={lastName} onChange={setLastName} />
@@ -2395,7 +2434,7 @@ function EditAdminBookingModal({ booking, onClose }: { booking?: BookingItem; on
         </section>
       ) : null}
       {error ? <p className="booking-form__error">{error}</p> : null}
-      <ModalActions primary={saving ? 'Salvando...' : 'Salvar alteracoes'} secondary="Cancelar" primaryIcon="edit" onSecondary={onClose} onPrimary={save} />
+      <ModalActions primary={saving ? 'Salvando...' : 'Salvar alteracoes'} secondary="Cancelar" primaryIcon="edit" onSecondary={onClose} onPrimary={save} disabledPrimary={saving || !source} />
     </>
   );
 }

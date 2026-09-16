@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ServicoResponse, AvailabilityBlockResponse } from '../../../types/api';
 import { previewAdminBlocks, type AdminBlockMode, type AdminBlockEntry } from '../api/manage-admin-blocks';
 import AlertNotice from '../../../components/ui/AlertNotice';
+import { toAppDatePart, toAppTimePart } from '../../../lib/dates';
 
 type AdminSelectionModalMode = 'block' | 'cancel' | 'view';
 
@@ -51,7 +52,7 @@ function bookingName(booking: ServicoResponse) {
 }
 
 function blockDate(block: AvailabilityBlockResponse) {
-  return block.start.slice(0, 10);
+  return toAppDatePart(block.start);
 }
 
 export default function AdminSelectionModal({
@@ -91,7 +92,7 @@ export default function AdminSelectionModal({
     [...safeBookings]
       .sort((left, right) => left.start.localeCompare(right.start))
       .forEach((booking) => {
-        const key = booking.start.slice(0, 10);
+        const key = toAppDatePart(booking.start);
         const current = map.get(key) ?? [];
         current.push(booking);
         map.set(key, current);
@@ -324,7 +325,7 @@ export default function AdminSelectionModal({
                         >
                           <div className="admin-selection-booking-card__top">
                             <strong>{bookingName(booking)}</strong>
-                            <span>{booking.start.slice(11, 16)}</span>
+                            <span>{toAppTimePart(booking.start)}</span>
                           </div>
                           <span>{booking.clientAddressLine || booking.clientCity}</span>
                           <small>{booking.serviceType}</small>
@@ -370,7 +371,7 @@ export default function AdminSelectionModal({
                     {items.map((block) => (
                       <article key={block.blockId} className="admin-selection-booking-card admin-selection-booking-card--block">
                         <div className="admin-selection-booking-card__top">
-                          <strong>{block.type === 'DAY' ? 'Dia inteiro' : `${block.start.slice(11, 16)} — ${block.end.slice(11, 16)}`}</strong>
+                          <strong>{block.type === 'DAY' ? 'Dia inteiro' : `${toAppTimePart(block.start)} — ${toAppTimePart(block.end)}`}</strong>
                           <button
                             type="button"
                             className="admin-selection-booking-card__danger"
@@ -417,7 +418,7 @@ export default function AdminSelectionModal({
                       <article key={booking.eventId} className="admin-selection-booking-card">
                         <div className="admin-selection-booking-card__top">
                           <strong>{bookingName(booking)}</strong>
-                          <span>{booking.start.slice(11, 16)}</span>
+                          <span>{toAppTimePart(booking.start)}</span>
                         </div>
                         <span>{booking.clientAddressLine || booking.clientCity}</span>
                         <small>{booking.serviceType}</small>
