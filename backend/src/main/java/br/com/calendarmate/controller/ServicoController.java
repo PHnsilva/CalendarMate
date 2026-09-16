@@ -1,6 +1,7 @@
 package br.com.calendarmate.controller;
 
 import br.com.calendarmate.dto.AdminAssignProviderRequest;
+import br.com.calendarmate.dto.AdminRescheduleRequest;
 import br.com.calendarmate.dto.AvailableSlotResponse;
 import br.com.calendarmate.dto.ServicoCreateResponse;
 import br.com.calendarmate.dto.ServicoRequest;
@@ -113,6 +114,16 @@ public class ServicoController {
 
         AdminPrincipal principal = adminAuthService.require(session);
         return ResponseEntity.ok(service.updateByIdAdmin(eventId, principal, req));
+    }
+
+    @PutMapping("/admin/{eventId}/reschedule")
+    public ResponseEntity<ServicoResponse> adminReschedule(
+            @RequestHeader(value = "X-ADMIN-SESSION", required = false) String session,
+            @PathVariable String eventId,
+            @Valid @RequestBody AdminRescheduleRequest req) throws IOException {
+
+        AdminPrincipal principal = adminAuthService.require(session);
+        return ResponseEntity.ok(service.rescheduleByIdAdmin(eventId, principal, req));
     }
 
     @PutMapping("/admin/{eventId}/assignee")

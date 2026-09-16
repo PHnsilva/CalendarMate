@@ -73,6 +73,13 @@ public class SupabaseBookingHistoryStore implements BookingHistoryStore {
     }
 
     @Override
+    public void deleteByEventId(String eventId) {
+        if (eventId != null && !eventId.isBlank()) {
+            sb.delete(table, Map.of("event_id", eventId));
+        }
+    }
+
+    @Override
     public int deleteOlderThan(Instant olderThan) {
         return sb.deleteLt(table, "start_epoch", olderThan.getEpochSecond());
     }

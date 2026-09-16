@@ -10,5 +10,7 @@ public interface BookingHistoryStore {
 
     List<ServicoResponse> list(Instant fromInclusive, Instant toExclusive, String assignedProviderId);
 
+    void deleteByEventId(String eventId);
+
     int deleteOlderThan(Instant olderThan);
 }

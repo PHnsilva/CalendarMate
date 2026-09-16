@@ -30,6 +30,13 @@ public class InMemoryBookingHistoryStore implements BookingHistoryStore {
     }
 
     @Override
+    public void deleteByEventId(String eventId) {
+        if (eventId != null) {
+            byEventId.remove(eventId);
+        }
+    }
+
+    @Override
     public int deleteOlderThan(Instant olderThan) {
         int before = byEventId.size();
         byEventId.entrySet().removeIf(entry -> entry.getValue().getStart() != null && entry.getValue().getStart().isBefore(olderThan));

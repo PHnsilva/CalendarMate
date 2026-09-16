@@ -73,6 +73,30 @@ public class AvailabilityPolicyService {
         return false;
     }
 
+    public String explainUnavailableInterval(Instant start, Instant end) throws IOException {
+        if (start == null || end == null || !end.isAfter(start)) {
+            return "Data ou horário inválido";
+        }
+
+        LocalDate startDate = start.atZone(ZONE).toLocalDate();
+        LocalDate endDate = end.atZone(ZONE).toLocalDate();
+        if (!startDate.equals(endDate)) {
+            return "O atendimento precisa começar e terminar no mesmo dia";
+        }
+
+        TimeWindow requested = new TimeWindow(start, end);
+        List<TimeWindow> blocks = listRuleWindows(startDate, AvailabilityRuleMode.BLOCK);
+        if (blocks.stream().anyMatch(block -> block.overlaps(requested))) {
+            return "Horário bloqueado na agenda administrativa. Remova o bloqueio antes de reagendar";
+        }
+
+        if (isBaseOffDay(startDate)) {
+            return "Data indisponível pela escala 4x4. Libere o dia ou o horário na agenda antes de reagendar";
+        }
+
+        return "Horário fora do período de atendimento ou do intervalo liberado na agenda";
+    }
+
     public boolean hasAnyAvailability(LocalDate date) throws IOException {
         return !resolveAllowedWindows(date).isEmpty();
     }

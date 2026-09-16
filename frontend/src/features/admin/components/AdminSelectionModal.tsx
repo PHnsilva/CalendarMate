@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ServicoResponse, AvailabilityBlockResponse } from '../../../types/api';
 import { previewAdminBlocks, type AdminBlockMode, type AdminBlockEntry } from '../api/manage-admin-blocks';
 import AlertNotice from '../../../components/ui/AlertNotice';
-import { toAppDatePart, toAppTimePart } from '../../../lib/dates';
+import { APP_TIME_ZONE, toAppDatePart, toAppTimePart } from '../../../lib/dates';
 
 type AdminSelectionModalMode = 'block' | 'cancel' | 'view';
 
@@ -44,6 +44,7 @@ function formatDateTime(value: string) {
   return new Intl.DateTimeFormat('pt-BR', {
     dateStyle: 'short',
     timeStyle: 'short',
+    timeZone: APP_TIME_ZONE,
   }).format(new Date(value));
 }
 

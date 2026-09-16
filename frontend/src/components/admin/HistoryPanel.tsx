@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import historyIcon from '../../assets/wireframes/icons/admin-history-clock.png';
-import { useAdminBookings } from '../../features/admin/hooks/useAdminBookings';
+import { useAdminHistory } from '../../features/admin/hooks/useAdminHistory';
+import { rescheduleAdminBooking } from '../../features/admin/api/reschedule-admin-booking';
 import { getStoredAdminToken } from '../../lib/storage';
 import { toAppDateTimeParts } from '../../lib/dates';
 import type { ServicoResponse } from '../../types/api';
@@ -47,10 +49,6 @@ function formatStatus(status?: string): string {
   return 'Confirmado';
 }
 
-function isCompleted(status: string): boolean {
-  return normalize(status).includes('concl') || normalize(status).includes('complete') || normalize(status).includes('done');
-}
-
 function mapBooking(booking: ServicoResponse): HistoryBooking {
   const start = toAppDateTimeParts(booking.start);
   const date = start.date || toAppDateTimeParts(new Date()).date;
@@ -60,7 +58,7 @@ function mapBooking(booking: ServicoResponse): HistoryBooking {
     client: fullClientName(booking),
     date,
     email: booking.clientEmail || 'Não informado',
-    notes: booking.serviceType || 'Sem observações registradas.',
+    notes: booking.serviceNotes || 'Sem observações registradas.',
     phone: booking.clientPhone || 'Não informado',
     provider: booking.assignedProviderName || 'A definir',
     service: booking.serviceType || 'Serviço não informado',
@@ -83,17 +81,23 @@ function Avatar({ name }: { name: string }) {
 }
 
 export function HistoryPanel() {
+  const queryClient = useQueryClient();
   const hasAdminToken = Boolean(getStoredAdminToken());
-  const query = useAdminBookings({}, hasAdminToken);
+  const query = useAdminHistory({}, hasAdminToken);
   const [selectedId, setSelectedId] = useState('');
   const [period, setPeriod] = useState<PeriodFilter>('30');
   const [client, setClient] = useState('ALL');
   const [provider, setProvider] = useState('ALL');
   const [search, setSearch] = useState('');
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState('');
+  const [rescheduleTime, setRescheduleTime] = useState('');
+  const [rescheduleError, setRescheduleError] = useState('');
+  const [rescheduleMessage, setRescheduleMessage] = useState('');
+  const [rescheduling, setRescheduling] = useState(false);
 
   const allBookings = useMemo(() => (query.data ?? []).map(mapBooking).sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`)), [query.data]);
-  const completedBookings = useMemo(() => allBookings.filter((booking) => isCompleted(booking.status)), [allBookings]);
-  const sourceBookings = completedBookings.length ? completedBookings : allBookings;
+  const sourceBookings = allBookings;
   const clientOptions = useMemo(() => Array.from(new Set(sourceBookings.map((booking) => booking.client))).sort(), [sourceBookings]);
   const providerOptions = useMemo(() => Array.from(new Set(sourceBookings.map((booking) => booking.provider))).sort(), [sourceBookings]);
 
@@ -109,6 +113,49 @@ export function HistoryPanel() {
   }, [client, period, provider, search, sourceBookings]);
 
   const selected = filteredBookings.find((booking) => booking.id === selectedId) ?? filteredBookings[0] ?? sourceBookings[0];
+
+  const openReschedule = () => {
+    if (!selected) return;
+    setRescheduleDate('');
+    setRescheduleTime(selected.time === '--:--' ? '' : selected.time);
+    setRescheduleError('');
+    setRescheduleMessage('');
+    setRescheduleOpen(true);
+  };
+
+  const submitReschedule = async () => {
+    if (!selected || rescheduling) return;
+    if (!rescheduleDate) {
+      setRescheduleError('Escolha a nova data.');
+      return;
+    }
+    if (!/^\d{2}:00$/.test(rescheduleTime)) {
+      setRescheduleError('Escolha um horário com minutos 00.');
+      return;
+    }
+
+    setRescheduling(true);
+    setRescheduleError('');
+    setRescheduleMessage('');
+    try {
+      await rescheduleAdminBooking(selected.id, {
+        date: rescheduleDate,
+        time: rescheduleTime,
+      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['admin-history'] }),
+        queryClient.invalidateQueries({ queryKey: ['admin-bookings'] }),
+        queryClient.invalidateQueries({ queryKey: ['admin-summary'] }),
+      ]);
+      setRescheduleMessage('Atendimento reagendado e devolvido à agenda ativa.');
+      setRescheduleOpen(false);
+      setSelectedId('');
+    } catch (error) {
+      setRescheduleError(error instanceof Error ? error.message : 'Não foi possível reagendar o atendimento.');
+    } finally {
+      setRescheduling(false);
+    }
+  };
 
   return (
     <section className="wf-admin-section admin-history-panel admin-history-panel--wireframe" aria-label="Histórico de agendamentos">
@@ -153,7 +200,7 @@ export function HistoryPanel() {
         <section className="admin-history-results" aria-label="Agendamentos concluídos">
           <div className="admin-section-heading">
             <div>
-              <h2>{completedBookings.length ? 'Agendamentos concluídos' : 'Agendamentos carregados'}</h2>
+              <h2>Agendamentos do histórico</h2>
               <p>{filteredBookings.length} registro(s) reais do sistema</p>
             </div>
             <strong>Mais recentes</strong>
@@ -169,7 +216,12 @@ export function HistoryPanel() {
                 key={booking.id}
                 type="button"
                 className={booking.id === selected?.id ? 'is-active' : ''}
-                onClick={() => setSelectedId(booking.id)}
+                onClick={() => {
+                  setSelectedId(booking.id);
+                  setRescheduleOpen(false);
+                  setRescheduleError('');
+                  setRescheduleMessage('');
+                }}
               >
                 <span className="admin-history-date"><strong>{ptDate.format(toLocalDate(booking.date))}</strong><em>{booking.time}</em><i>{booking.status}</i></span>
                 <span className="admin-history-client"><strong>{booking.client}</strong><small>{booking.phone}</small><em>{booking.notes}</em><b>Código: {booking.id}</b></span>
@@ -200,6 +252,27 @@ export function HistoryPanel() {
               <dt>Endereço</dt><dd>{selected.address}</dd>
               <dt>Observações do cliente</dt><dd>{selected.notes}</dd>
             </dl>
+            <button type="button" className="admin-history-reschedule-button" onClick={openReschedule}>
+              Reagendar atendimento
+            </button>
+            {rescheduleOpen ? (
+              <section className="admin-history-reschedule-form" aria-label="Reagendar atendimento do histórico">
+                <strong>Nova data e horário</strong>
+                <p>Os dados do cliente, endereço, serviço e prestador serão mantidos.</p>
+                <div>
+                  <label>Data<input type="date" min={toAppDateTimeParts(new Date()).date} value={rescheduleDate} onChange={(event) => setRescheduleDate(event.target.value)} /></label>
+                  <label>Horário<input type="time" step={3600} value={rescheduleTime} onChange={(event) => setRescheduleTime(event.target.value)} /></label>
+                </div>
+                {rescheduleError ? <span className="admin-history-reschedule-error">{rescheduleError}</span> : null}
+                <footer>
+                  <button type="button" onClick={() => setRescheduleOpen(false)} disabled={rescheduling}>Cancelar</button>
+                  <button type="button" onClick={() => void submitReschedule()} disabled={rescheduling || !rescheduleDate || !rescheduleTime}>
+                    {rescheduling ? 'Reagendando...' : 'Confirmar reagendamento'}
+                  </button>
+                </footer>
+              </section>
+            ) : null}
+            {rescheduleMessage ? <p className="admin-history-reschedule-success">{rescheduleMessage}</p> : null}
           </aside>
         ) : null}
       </div>

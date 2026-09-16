@@ -1,6 +1,7 @@
 package br.com.calendarmate.service;
 
 import br.com.calendarmate.config.AppProperties;
+import br.com.calendarmate.dto.AdminRescheduleRequest;
 import br.com.calendarmate.dto.AvailableSlotResponse;
 import br.com.calendarmate.dto.ServicoCreateResponse;
 import br.com.calendarmate.dto.ServicoRequest;
@@ -682,6 +683,52 @@ public class ServicoService {
         return mapEventToResponse(updated == null ? existing : updated);
     }
 
+    public ServicoResponse rescheduleByIdAdmin(
+            String eventId,
+            AdminPrincipal principal,
+            AdminRescheduleRequest req) throws IOException {
+        Event existing = calendar.getEvent(eventId);
+        if (existing == null) {
+            throw new NotFoundException("Agendamento não encontrado no calendário");
+        }
+        if (!canPrincipalAccessEvent(principal, existing)) {
+            throw new ForbiddenException("Agendamento não designado para este prestador");
+        }
+
+        validateAdminDateWindow(req.getDate());
+        if (req.getDate().isBefore(LocalDate.now(ZONE))) {
+            throw new BadRequestException("A nova data do reagendamento não pode estar no passado");
+        }
+        validateTime(req.getTime());
+
+        Servico service = servicoFromEvent(existing);
+        BookingWindow window = resolveBookingWindow(req.getDate(), req.getTime(), service.getClientCity());
+        Instant start = window.blockStart();
+        Instant end = window.blockEnd();
+        if (!end.isAfter(start)) {
+            throw new BadRequestException("Horário inválido");
+        }
+
+        validateRequestedWindowAvailable(start, end);
+        validateAdminBusyWindow(existing, start, end);
+
+        service.setStart(start);
+        service.setEnd(end);
+        service.setAppointmentStart(window.appointmentStart());
+        service.setAppointmentEnd(window.appointmentEnd());
+        service.setStatus("CONFIRMED");
+        service.setPendingExpiresAt(null);
+
+        Event updated = calendar.updateEvent(service);
+        if (updated == null) {
+            throw new NotFoundException("Agendamento não encontrado no calendário");
+        }
+
+        bookingHistoryStore.deleteByEventId(eventId);
+        pendingStore.deleteByEventId(eventId);
+        return mapEventToResponse(updated);
+    }
+
     public List<AvailableSlotResponse> getAvailableSlots(LocalDate date, String city, int slotMinutes) throws IOException {
         validateDateWindow(date);
 
@@ -782,7 +829,7 @@ public class ServicoService {
     private void validateRequestedWindowAvailable(Instant start, Instant end) throws IOException {
         boolean allowed = availabilityPolicyService.isIntervalAllowed(start, end);
         if (!allowed) {
-            throw new BadRequestException("Horário indisponível");
+            throw new BadRequestException(availabilityPolicyService.explainUnavailableInterval(start, end));
         }
     }
 
@@ -863,7 +910,7 @@ public class ServicoService {
         Instant oldEnd = instantFrom(existing.getEnd());
         for (TimePeriod tp : busy) {
             if (tp.getStart() == null || tp.getEnd() == null) {
-                throw new ConflictException("Horario indisponivel");
+                throw new ConflictException("Não foi possível confirmar a disponibilidade desse horário");
             }
             Instant bs = Instant.ofEpochMilli(tp.getStart().getValue());
             Instant be = Instant.ofEpochMilli(tp.getEnd().getValue());
@@ -871,7 +918,7 @@ public class ServicoService {
                     && !bs.isBefore(oldStart)
                     && !be.isAfter(oldEnd);
             if (!isSelf) {
-                throw new ConflictException("Horario indisponivel");
+                throw new ConflictException("Horário ocupado por outro agendamento");
             }
         }
     }
