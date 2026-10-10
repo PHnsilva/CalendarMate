@@ -10,7 +10,6 @@ Sistema de agendamentos para serviços locais, com frontend React/Vite, backend 
 ![Vite](https://img.shields.io/badge/Vite-7-1f6fd1?style=for-the-badge&logo=vite&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-backend-1f6fd1?style=for-the-badge&logo=render&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-frontend-1f6fd1?style=for-the-badge&logo=vercel&logoColor=white)
-![License](https://img.shields.io/badge/License-Source--Available-c24a2d?style=for-the-badge)
 
 ## Sobre
 
@@ -40,8 +39,8 @@ Render  -> backend Dockerizado
 - Consulta de horários disponíveis por dia.
 - Consulta pública de agendamentos por telefone, sem token, conta ou OTP.
 - Cancelamento público por telefone com verificação de pertencimento, histórico e limite de tentativas.
-- Painel admin por telefone/SMS, sessao temporaria e papeis `OWNER`/`PROVIDER`.
-- Apos confirmar o telefone do owner `31995438467`, selecao de workspace entre Admin e prestadores cadastrados.
+- Painel admin por telefone/OTP, sessão temporária e papéis `OWNER`/`PROVIDER`.
+- Após confirmar o telefone de um usuário `OWNER` cadastrado, seleção de workspace entre Admin e prestadores ativos.
 - Bloqueios de disponibilidade e escala 4x4.
 - Histórico com retenção configurável, por padrão 2 meses.
 - Extrato/admin financeiro via provider `DUMMY` ou Banco Inter.
@@ -49,16 +48,16 @@ Render  -> backend Dockerizado
 
 ## Integrações e alternância
 
-| Integração | Padrão seguro em dev | Produção real | Obrigatória? | Variáveis principais |
-|---|---:|---:|---:|---|
-| OTP dummy | Sim | Não | Não | `VERIFICATION_CHANNEL=DUMMY` |
-| SMS/NotificationAPI | Opcional | Recomendado no fluxo atual | Sim, se usar SMS real | `VERIFICATION_CHANNEL=SMS`, `SMS_NOTIFICATIONAPI_ENABLED=true` |
-| Meta WhatsApp | Desativado | Opcional/futuro | Não | `VERIFICATION_CHANNEL=META`, `WHATSAPP_ENABLED=true` |
-| Google Calendar | Dummy sem credenciais | Opcional/real | Não para dev | `GOOGLE_CALENDAR_ENABLED`, `GOOGLE_*` |
-| Geoapify | Opcional | Principal no projeto real | Sim, para mapas/rotas reais | `GEOAPIFY_ENABLED=true`, `GEOAPIFY_API_KEY` |
-| Google Routes | Desativado | Alternativa ao Geoapify | Não | `GOOGLE_MAPS_ENABLED=true` |
-| Supabase | In-memory se desativado | Recomendado | Sim para histórico real | `SUPABASE_ENABLED=true` |
-| Banco Inter | `DUMMY` | Opcional | Não | `BANKING_PROVIDER=INTER`, `INTER_ENABLED=true` |
+| Integração          |    Padrão seguro em dev |              Produção real |                Obrigatória? | Variáveis principais                                           |
+| ------------------- | ----------------------: | -------------------------: | --------------------------: | -------------------------------------------------------------- |
+| OTP dummy           |                     Sim |                        Não |                         Não | `VERIFICATION_CHANNEL=DUMMY`                                   |
+| SMS/NotificationAPI |                Opcional | Recomendado no fluxo atual |       Sim, se usar SMS real | `VERIFICATION_CHANNEL=SMS`, `SMS_NOTIFICATIONAPI_ENABLED=true` |
+| Meta WhatsApp       |              Desativado |            Opcional/futuro |                         Não | `VERIFICATION_CHANNEL=META`, `WHATSAPP_ENABLED=true`           |
+| Google Calendar     |   Dummy sem credenciais |              Opcional/real |                Não para dev | `GOOGLE_CALENDAR_ENABLED`, `GOOGLE_*`                          |
+| Geoapify            |                Opcional |  Principal no projeto real | Sim, para mapas/rotas reais | `GEOAPIFY_ENABLED=true`, `GEOAPIFY_API_KEY`                    |
+| Google Routes       |              Desativado |    Alternativa ao Geoapify |                         Não | `GOOGLE_MAPS_ENABLED=true`                                     |
+| Supabase            | In-memory se desativado |                Recomendado |     Sim para histórico real | `SUPABASE_ENABLED=true`                                        |
+| Banco Inter         |                 `DUMMY` |                   Opcional |                         Não | `BANKING_PROVIDER=INTER`, `INTER_ENABLED=true`                 |
 
 A prioridade de rotas no backend é: **Geoapify habilitado com chave > Google Routes habilitado com chave > rotas desabilitadas**.
 
@@ -91,7 +90,7 @@ Os cabeçalhos `X-Forwarded-For`/`X-Real-IP` só são considerados quando `TRUST
 
 ### Confirmação por SMS
 
-O SMS real usa NotificationAPI. O limite mensal padrão é de 100 SMS, e o backend bloqueia automaticamente novos envios ao atingir esse limite para evitar custos.
+O SMS real usa NotificationAPI. O limite mensal configurado por padrão é de 100 tentativas. O contador é armazenado em um arquivo local e bloqueia novos envios quando o limite é atingido. Ele não substitui a apuração do provedor: apagar o arquivo, usar disco efêmero ou executar múltiplas instâncias pode reiniciar ou separar a contagem.
 
 ```env
 VERIFICATION_CHANNEL=SMS
@@ -163,7 +162,7 @@ Arquivo base: `frontend/.env.example`.
 VITE_API_BASE_URL=https://seu-backend.onrender.com
 VITE_GEOAPIFY_PUBLIC_KEY=...
 VITE_ADMIN_ENABLED=true
-VITE_SUPPORT_WHATSAPP_NUMBER=553195415323
+VITE_SUPPORT_WHATSAPP_NUMBER=<telefone-comercial-em-formato-internacional>
 ```
 
 `VITE_SUPPORT_WHATSAPP_NUMBER` deve conter o telefone comercial no formato internacional, somente dígitos. Ele é usado de forma centralizada pelos links `wa.me`.
@@ -181,6 +180,17 @@ No Vercel, configure `VITE_API_BASE_URL` com a URL pública do backend no Render
 
 ## Rodar localmente
 
+Pré-requisitos: Git, JDK 17 para o backend e Node.js 20.19 ou 22.12 ou superior com npm para o frontend. O Gradle Wrapper está versionado.
+
+```bash
+git clone https://github.com/PHnsilva/CalendarMate.git
+cd CalendarMate
+```
+
+No desenvolvimento, o backend usa `application.properties` e variáveis do processo; não carrega `backend/.env` automaticamente. O frontend carrega `frontend/.env` pelo Vite. Em Docker, o Compose lê `.env` **na raiz**, conforme `env_file`.
+
+Para executar sem serviços externos, mantenha `VERIFICATION_CHANNEL=DUMMY`, `SMS_NOTIFICATIONAPI_ENABLED=false`, `SUPABASE_ENABLED=false` e `BANKING_ENABLED=false`. Esse modo usa dados em memória e não representa uma configuração de produção.
+
 ### Backend
 
 ```bash
@@ -188,13 +198,19 @@ cd backend
 ./gradlew bootRun
 ```
 
+No PowerShell, dentro de `backend/`, use `.\gradlew.bat bootRun`.
+
 ### Frontend
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
+
+## Validação
+
+Dentro de `backend/`: `./gradlew test` ou `.\gradlew.bat test` no PowerShell. Dentro de `frontend/`: `npm run lint`, `npm test` e `npm run build`. Os testes existentes não comprovam envio de SMS, integração bancária ou persistência em serviços reais.
 
 ## Build
 
@@ -212,13 +228,7 @@ cd frontend
 npm run build
 ```
 
-Se o Vite/Rollup falhar por dependência opcional do Rollup em ambiente Linux, remova `node_modules` e reinstale:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-npm run build
-```
+Se houver erro de dependência opcional do Rollup, confirme a versão do Node e reinstale com `npm ci`. Preserve o lockfile versionado; não apague `package-lock.json` como etapa normal de execução.
 
 ## Deploy
 
@@ -262,6 +272,9 @@ VITE_API_BASE_URL=https://seu-backend.onrender.com
 - `PUT /api/servicos/me/{eventId}?token=...`
 - `DELETE /api/servicos/me/{eventId}?token=...`
 
+- `POST /api/servicos/public/lookup`
+- `POST /api/servicos/public/cancel`
+
 ### OTP
 
 - `POST /api/verify/start`
@@ -304,8 +317,18 @@ Registro central de prestadores:
 - `GET /api/admin/finance/statement?from=YYYY-MM-DD&to=YYYY-MM-DD` (`OWNER`)
 - `GET /api/admin/finance/health` (`OWNER`)
 
+## Documentação e contribuição
+
+- [Backend](backend/README.md): execução, consulta pública e autorização dos workspaces.
+- [Frontend](frontend/README.md): scripts, ambiente e fluxo administrativo.
+- [SQL Supabase](docs/supabase-admin-auth.sql): tabelas e índices usados na integração.
+
+Abra uma branch e um pull request com a alteração e as verificações realizadas. Preserve os contratos públicos, as regras de cancelamento e a autorização por prestador.
+
+## Limites de desenvolvimento e produção
+
+Os padrões de `application.properties` habilitam `DEBUG_OTP_CODE` e `DEBUG_ADMIN_ENABLED`. Desative ambos no ambiente de produção, configure segredos reais e revise as integrações necessárias. A configuração de deploy não comprova que SMS, Google Calendar, mapas, Supabase ou Banco Inter estejam ativos.
+
 ## Licença
 
-Este projeto usa licença **source-available personalizada**. O uso é permitido para estudo, avaliação, aprendizado, uso privado e fins educacionais. Uso comercial concorrente, revenda, oferta como SaaS, marketplace ou produto equivalente sem autorização são proibidos.
-
-Veja `LICENSE.md`.
+Não há `LICENSE` ou `LICENSE.md` versionado nesta base. A referência anterior a uma licença source-available não pode ser conferida no repositório; consulte o autor sobre os termos de uso.
