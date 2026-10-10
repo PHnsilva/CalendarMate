@@ -2,11 +2,14 @@
 
 React/Vite client for the public booking flow, client booking recovery, and admin/provider workspaces.
 
+Requires Node.js 20.19 or 22.12 or later and npm. Run the following commands inside `frontend/`. The [main README](../README.md) covers backend prerequisites and deployment.
+
 ## Scripts
 
 ```bash
-npm install
+npm ci
 npm run dev
+npm run lint
 npm run test
 npm run build
 ```

@@ -2,6 +2,12 @@
 
 Spring Boot backend for bookings, OTP verification, admin/provider sessions, availability, history, routes, and finance integrations.
 
+## Configuration
+
+Requires JDK 17. Spring reads `src/main/resources/application.properties` and process environment variables. It does not automatically load a local `.env` file. The root Compose configuration reads the root `.env` through `env_file`. See the [main README](../README.md) for environment and deployment configuration.
+
+`DEBUG_OTP_CODE` and `DEBUG_ADMIN_ENABLED` default to true for development. Set both to false in production. Dummy integrations and in-memory stores do not provide production persistence.
+
 ## Run And Build
 
 ```bash
@@ -31,7 +37,7 @@ Content-Type: application/json
 
 The response DTO contains only `eventId`, `serviceType`, `start`, and `status`. Cancellation uses `POST /api/servicos/public/cancel` with both `eventId` and `phone`; the service normalizes the phone and verifies ownership before persisting `CANCELLED`. Repeated cancellation is idempotent. A cancelled Google event is retained as transparent so it releases availability without deleting history.
 
-Production must enable Google Calendar so events and occupied slots survive a process restart, and should also enable Supabase for resilient history snapshots. `DummyCalendarClient` and the in-memory history store are development fallbacks only. Apply `docs/supabase-admin-auth.sql` before or alongside deployment; the backend remains compatible while the optional cancellation metadata columns roll out.
+Production must enable Google Calendar so events and occupied slots survive a process restart, and should also enable Supabase for resilient history snapshots. `DummyCalendarClient` and the in-memory history store are development fallbacks only. Apply [`docs/supabase-admin-auth.sql`](../docs/supabase-admin-auth.sql) before or alongside deployment; the backend remains compatible while the optional cancellation metadata columns roll out.
 
 The lookup and cancellation rate limits are configurable with `PUBLIC_BOOKING_*_RATE_*`. Forwarded IP headers remain ignored unless both `TRUST_PROXY_HEADERS=true` and an exact direct-proxy allowlist in `TRUSTED_PROXY_ADDRESSES` are configured.
 
@@ -50,7 +56,7 @@ Production should use the Supabase `admin_users` table:
 The no-Supabase fallback is `ADMIN_USERS`:
 
 ```env
-ADMIN_USERS=31995438467|SG Admin|OWNER|owner-main;31900000001|Prestador 1|PROVIDER|provider-1;31900000002|Prestador 2|PROVIDER|provider-2;31900000003|Prestador 3|PROVIDER|provider-3
+ADMIN_USERS=31900000000|Administrador de exemplo|OWNER|owner-main;31900000001|Prestador 1|PROVIDER|provider-1;31900000002|Prestador 2|PROVIDER|provider-2;31900000003|Prestador 3|PROVIDER|provider-3
 ```
 
 Replace placeholder provider phones before production. Adding a provider should be a new `admin_users` row or one new `ADMIN_USERS` entry.
