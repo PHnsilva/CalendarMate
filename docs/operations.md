@@ -21,6 +21,8 @@ cd ../backend
 
 Para o recorte de rotas: `.\gradlew.bat test --tests '*RoutesServiceTest' --tests '*GeoCoordinatesTest' --console=plain`. Saídas detalhadas ficam em logs locais ignorados; o registro versionado guarda contagens e falhas relevantes.
 
+Se o OneDrive bloquear arquivos de build, um init script Gradle **local**, fora do Git, pode direcionar `buildDir` para `C:/DevCache/CalendarMate/backend-build`. Executar com `gradlew.bat -I <caminho-do-init-script> test`; preservar a configuração versionada e os arquivos existentes. O cache de dependências pode usar `GRADLE_USER_HOME` no C:.
+
 ## Smoke somente leitura
 
 `node tools/smoke.mjs` não faz rede sem `CM_API_BASE_URL`. Com a URL explicitamente configurada, consulta apenas bootstrap e rejeição de agenda admin sem sessão. Não consulta disponibilidade: `GetAvailableSlotsUseCase.execute` executa limpeza de pendências e, portanto, um GET não é necessariamente livre de efeitos.
