@@ -6,6 +6,8 @@ Inventário estático de 22/11/2026, sobre `90d0fa9`. O tamanho de arquivos e a 
 
 Frontend React/Vite e backend Spring Boot são unidades de implantação separadas. No backend, `booking/application/GetAvailableSlotsUseCase` e `verification/application/*` já existem; vários outros pacotes de módulos contêm apenas `package-info.java`. `service/ServicoService`, controllers, DTOs e stores continuam compartilhando responsabilidades. No frontend há `entities`, `features`, `widgets` e adaptadores de compatibilidade; `CalendarMateRoutes.tsx` e CSS globais ainda concentram implementação.
 
+Na proposta da issue #4, `routing/domain/GeoCoordinates` isola a política geográfica sem dependências externas. `RoutesService` delega somente essa validação, mantendo autenticação, obtenção do evento, endereço e provedores. Isso é um primeiro recorte interno; a capacidade de rotas completa ainda depende de tipos legados e não é um serviço independente.
+
 ## Propriedade e separação
 
 | Capacidade | Implementação e dependências atuais | Dados e responsabilidades | Destino e prioridade |
