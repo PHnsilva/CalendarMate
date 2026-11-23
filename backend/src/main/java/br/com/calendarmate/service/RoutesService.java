@@ -5,6 +5,7 @@ import br.com.calendarmate.exception.BadRequestException;
 import br.com.calendarmate.exception.ForbiddenException;
 import br.com.calendarmate.google.CalendarClient;
 import br.com.calendarmate.integrations.routes.RouteClient;
+import br.com.calendarmate.routing.domain.GeoCoordinates;
 import com.google.api.services.calendar.model.Event;
 
 import java.io.IOException;
@@ -55,11 +56,11 @@ public class RoutesService {
     }
 
     private RouteComputeResponse computeFromEvent(Event event, double originLat, double originLng) {
-        if (!validCoordinates(originLat, originLng)) throw new BadRequestException("Origem inválida para calcular rota");
+        if (!GeoCoordinates.isValid(originLat, originLng)) throw new BadRequestException("Origem inválida para calcular rota");
         Map<String, String> ext = privateExt(event);
         Double destinationLat = coordinate(ext.get("clientLatitude"));
         Double destinationLng = coordinate(ext.get("clientLongitude"));
-        if (!validCoordinates(destinationLat, destinationLng)) {
+        if (!GeoCoordinates.isValid(destinationLat, destinationLng)) {
             destinationLat = null;
             destinationLng = null;
         }
@@ -113,11 +114,6 @@ public class RoutesService {
         } catch (NumberFormatException ex) {
             return null;
         }
-    }
-
-    private boolean validCoordinates(Double lat, Double lng) {
-        return lat != null && lng != null && Double.isFinite(lat) && Double.isFinite(lng)
-                && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
     }
 
     private Map<String, String> privateExt(Event e) {
