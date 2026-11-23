@@ -1,0 +1,10 @@
+# Desenvolvimento do SG Pequenos Reparos
+
+- Leia `docs/README.md`, `docs/product.md`, `docs/architecture/service-extraction.md`, `docs/delivery.md` e a issue escolhida. Consulte `docs/operations.md` antes de executar verificações externas. Use os demais documentos apenas para a área alterada.
+- O produto é SG Pequenos Reparos; CalendarMate permanece o identificador técnico do repositório, pacotes e serviços. Não renomeie integrações incidentalmente.
+- Confira status local, remoto, issues, PRs e Project 15. Preserve alterações existentes e o PR #2. Uma branch `codex/` e um PR focado por issue; nunca escreva na master. Não faça merge, auto-merge, deploy ou alteração de permissões sem autorização específica de Pedro.
+- Comece com fluxos pequenos e caracterizados. Extraia fronteiras internas antes de criar serviços ou repositórios. Nenhum serviço novo, assinatura, SMS real, operação bancária, alteração de esquema ou atualização ampla de dependências está autorizado nesta etapa.
+- Em cada rodada de quarta/domingo às 04h30 de America/Sao_Paulo, confira mudanças desde o último registro, rode a verificação mínima relevante e avance no máximo uma pequena entrega pronta. Reutilize evidência válida para o mesmo SHA; amplie testes ao alterar código compartilhado ou diante de falha. Não releia o repositório inteiro nem repita consultas sem mudança.
+- Use scripts/testes locais com saídas resumidas. Não exponha chaves, telefones, sessões, dados de clientes ou corpos de respostas reais. Instruções para agentes ficam neste arquivo; especificações e evidências técnicas nos documentos próprios.
+- Credenciais só por armazenamento seguro/ambiente, sem copiá-las para o Git. Não use dados históricos da VDL. Trabalhe no C:. Custo adicional autorizado: zero. Confirme preços/cotas oficiais antes de serviços externos; se não houver confirmação, use mocks locais.
+- Registre comando, SHA, resultado, limites e próxima ação em `docs/work-log.md` ou no PR, sem transcrições de chat. Teste local não é validação ponta a ponta em produção; CI verde não é aceite. Falha de acesso não autoriza desativar proteções.

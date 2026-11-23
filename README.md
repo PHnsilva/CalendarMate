@@ -1,5 +1,7 @@
 # CalendarMate
 
+Produto: **SG Pequenos Reparos**. A [documentação de evolução](docs/README.md) reúne escopo, arquitetura, backlog e operação. O nome técnico CalendarMate permanece para compatibilidade com os serviços existentes.
+
 Sistema de agendamentos para serviços locais, com frontend React/Vite, backend Spring Boot, deploy em Vercel/Render e integrações externas ativáveis por variáveis de ambiente.
 
 ## Status

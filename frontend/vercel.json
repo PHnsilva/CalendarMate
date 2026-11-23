@@ -1,4 +1,11 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "codex/organizar-monolito-modular": false,
+      "codex/5-corrigir-compilacao-testes": false,
+      "codex/4-coordenadas-rotas": false
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
