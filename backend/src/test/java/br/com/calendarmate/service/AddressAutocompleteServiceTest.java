@@ -10,9 +10,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -85,11 +87,10 @@ class AddressAutocompleteServiceTest {
         verify(http, times(3)).exchange(uriCaptor.capture(), eq(HttpMethod.GET), isNull(), eq(Map.class));
         String contextualQuery = UriComponentsBuilder.fromUri(uriCaptor.getAllValues().get(2))
                 .build()
-                .decode()
                 .getQueryParams()
                 .getFirst("text");
 
-        assertEquals("Avenida do Prateado, Moeda, MG", contextualQuery);
+        assertEquals("Avenida do Prateado, Moeda, MG", UriUtils.decode(contextualQuery, StandardCharsets.UTF_8));
         assertEquals(5, results.size());
     }
 

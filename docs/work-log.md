@@ -12,3 +12,10 @@
 - Frontend: `npm run build` e `npm run lint` aprovados. Nenhuma alteração no lockfile.
 - Backend: `gradlew.bat test --console=plain --no-daemon` compilou produção e falhou em `compileTestJava`: `AddressAutocompleteServiceTest` usa `UriComponents.decode()`, inexistente na versão resolvida. Correção isolada em #5; nenhum resultado de testes backend aprovado nesta linha de base.
 - Smoke: cinco testes locais aprovados; execução pública retornou PASS/200 no bootstrap, PASS/401 no admin, SKIP/MISSING_CONFIG no Supabase. Nenhuma consulta de disponibilidade (limpa pendências).
+
+## 22/11/2026 — Correção da compilação (#5)
+
+- `AddressAutocompleteServiceTest` passou a decodificar somente o parâmetro consultado com `UriUtils.decode(..., UTF_8)`, como já ocorre no teste de rotas. Asserções e código de produção preservados.
+- Uma tentativa local encontrou bloqueio de arquivos do OneDrive ao substituir classes de teste. Foi usado init script local com `allprojects { buildDir = 'C:/DevCache/CalendarMate/backend-build' }`; não há mudança de build versionada nem exclusão de arquivos.
+- Validação aprovada: JDK Temurin 17, Gradle wrapper 8.5; `gradlew.bat -I C:\DevCache\CalendarMate\build-location.gradle test --console=plain --no-daemon`. A suíte compilou e executou sem falhas; contagens constam no PR da correção. Logs completos permanecem fora do Git.
+- Base documental: PR #10, commit `ad2aa46`. PR de correção empilhado sobre essa branch para herdar a proteção contra previews Vercel. Ordem de integração: documentação → correção → política de coordenadas. Sem integração ou deploy executado.
