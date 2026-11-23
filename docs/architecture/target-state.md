@@ -1,5 +1,7 @@
 # CalendarMate Target Architecture
 
+Update 2026-11-22: [ADR 0002](adr/0002-reusable-capabilities.md) adds conditional extraction of reusable capabilities. The modular monolith remains the current deployment model; independent services are not yet implemented.
+
 Date: 2026-06-16
 
 The target architecture is an incremental structure for a React/Vite SPA and a
